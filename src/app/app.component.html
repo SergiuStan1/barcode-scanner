@@ -1,0 +1,63 @@
+  <div class="headerDiv">
+    <img class="logo" src="./assets/rps_white.png" id="headerLogo" />
+    <i class="fa fa-user-circle-o" id="headerUserIco" aria-hidden="true"></i>
+  </div>
+
+<div *ngIf="availableDevices">
+  <select>
+      <option value="" [selected]="!selectedDevice">No Device</option>
+      <option *ngFor="let device of availableDevices" [value]="device.deviceId" [selected]="selectedDevice && device.deviceId === selectedDevice.deviceId">{{ device.label }}</option>
+  </select>
+</div>
+
+<div [hidden]="!hasCameras">
+
+  <zxing-scanner #scanner class="test-class" start="true" [device]="selectedDevice" [formats]="allowedFormats" (scanSuccess)="handleQrCodeResult($event)"></zxing-scanner>
+
+  <h2 *ngIf="!this.selectedDevice">No camera selected.</h2>
+
+  <p>
+      Result:
+      <strong>{{ qrResultString }}</strong>
+  </p>
+  
+
+</div>
+
+<div *ngIf="!hasCameras && hasPermission === true">
+
+  <h1>Looks like your actual device does not has cameras.. </h1>
+
+</div>
+
+<div *ngIf="hasPermission === undefined">
+
+  <h2>Waiting for permissions.</h2>
+
+  <blockquote>
+      <h4>If your device does not has cameras, no permissions will be asked.</h4>
+  </blockquote>
+
+  <label class="barcode">Barcode</label>
+  <input class="barcode" type="text" id="barcode" name="barcode" readonly value="{{qrResultString}}" />
+
+</div>
+
+
+<div *ngIf="hasPermission === false">
+
+  <h1>You denied the camera permissions, we can't scan anything without it. </h1>
+
+</div>
+
+<video class="video" id="video" width="640" height="480" autoplay></video>
+
+<script>
+      var video = document.getElementById('video');
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+         navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+         video.src = window.URL.createObjectURL(stream);
+         video.play();
+         });
+        }      
+</script>
